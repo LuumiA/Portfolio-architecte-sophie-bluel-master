@@ -179,6 +179,10 @@ nav li {
 li:hover {
   color: #b1663c;
 }
+ul a {
+  text-decoration: none;
+}
+
 #introduction {
   display: flex;
   align-items: center;
