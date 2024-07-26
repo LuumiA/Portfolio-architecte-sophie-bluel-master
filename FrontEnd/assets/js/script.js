@@ -39,9 +39,37 @@ const getCategories = async () => {
     const resultCategories = await fetch(`${API_CATEGORIES}`);
     const dataCategories = await resultCategories.json();
     console.log(dataCategories);
+    // Insère les boutons dans le DOM
+    const categoriesContainer = document.getElementById("categories");
+
+    // Créer le bouton "Tous"
+    const allButton = document.createElement("button");
+    allButton.textContent = "Tous";
+    allButton.id = "all";
+    categoriesContainer?.appendChild(allButton);
+
+    // Créer les boutons pour les 3 premières catégories
+    dataCategories.slice(0, 3).forEach((category) => {
+      const categoryButton = document.createElement("button");
+      categoryButton.textContent = category.name; // Assume que chaque catégorie a un champ 'name'
+      categoryButton.id = category.name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, ""); // Remplace les espaces par des tirets et met en minuscule
+      categoriesContainer?.appendChild(categoryButton);
+    });
   } catch (error) {
     console.log(error);
   }
+};
+
+const handleButtonClick = (button) => {
+  // Enlever la classe active de tous les boutons
+  document
+    .querySelectorAll("#categories button")
+    .forEach((btn) => btn.classList.remove("active"));
+  // Ajouter la classe active au bouton cliqué
+  button.classList.add("active");
 };
 
 getCategories();
