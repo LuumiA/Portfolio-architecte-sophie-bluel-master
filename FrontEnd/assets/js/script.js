@@ -58,18 +58,20 @@ const getCategories = async () => {
         .replace(/[^a-z0-9-]/g, ""); // Remplace les espaces par des tirets et met en minuscule
       categoriesContainer?.appendChild(categoryButton);
     });
+
+    // Ajouter les écouteurs d'événements après l'insertion des boutons
+    const buttons = document.querySelectorAll("#categories button");
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        // Retirer la classe "active" de tous les boutons
+        buttons.forEach((btn) => btn.classList.remove("active"));
+        // Ajouter la classe "active" au bouton cliqué
+        button.classList.add("active");
+      });
+    });
   } catch (error) {
     console.log(error);
   }
-};
-
-const handleButtonClick = (button) => {
-  // Enlever la classe active de tous les boutons
-  document
-    .querySelectorAll("#categories button")
-    .forEach((btn) => btn.classList.remove("active"));
-  // Ajouter la classe active au bouton cliqué
-  button.classList.add("active");
 };
 
 getCategories();
