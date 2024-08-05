@@ -207,9 +207,56 @@ ul a {
 #introduction p {
   margin-bottom: 0.5em;
 }
+
 #portfolio h2 {
   text-align: center;
   margin-bottom: 1em;
+  margin-bottom: 0px;
+}
+
+.fa-pen-to-square {
+  font-size: 15px !important;
+  color: #000 !important;
+}
+
+.portfolio-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  margin-left: 36%;
+}
+
+.portfolio-header h2 {
+  margin: 0;
+  color: #1d6154;
+  text-align: center;
+  font-family: Syne;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.edit-section {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre l'icône et le bouton */
+}
+
+.edit-section i {
+  font-size: 24px; /* Taille de l'icône */
+  color: #1d6154; /* Couleur de l'icône */
+}
+
+#edit-link {
+  text-decoration: none;
+  font-size: 14px;
+  color: #000;
+  text-align: center;
+  font-family: "Work Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
 }
 
 #categories {
@@ -303,4 +350,8 @@ footer nav ul {
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+}
+
+.hidden {
+  display: none;
 }

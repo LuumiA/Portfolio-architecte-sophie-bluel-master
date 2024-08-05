@@ -1,4 +1,4 @@
-// Variables globals
+// Variables globales
 const galleryContainer = document.querySelector(".gallery");
 const categoriesContainer = document.getElementById("categories");
 const loginLink = document.getElementById("login-link");
@@ -6,6 +6,7 @@ const loginLink = document.getElementById("login-link");
 const API = "http://localhost:5678/api/works";
 let allWorks = [];
 
+// Fonction pour récupérer les œuvres
 const getWorks = async () => {
   try {
     const result = await fetch(`${API}`);
@@ -18,6 +19,7 @@ const getWorks = async () => {
   }
 };
 
+// Fonction pour afficher les œuvres
 const displayWorks = (works) => {
   galleryContainer.innerHTML = ""; // Effacer le contenu actuel de la galerie
   works.forEach((work) => {
@@ -26,6 +28,7 @@ const displayWorks = (works) => {
   });
 };
 
+// Fonction pour créer un élément figure pour une œuvre
 const figureWork = (work) => {
   const figure = document.createElement("figure");
   const image = document.createElement("img");
@@ -39,6 +42,8 @@ const figureWork = (work) => {
 };
 
 const API_CATEGORIES = "http://localhost:5678/api/categories";
+
+// Fonction pour récupérer les catégories
 const getCategories = async () => {
   try {
     const resultCategories = await fetch(`${API_CATEGORIES}`);
@@ -53,8 +58,8 @@ const getCategories = async () => {
 
     categoriesContainer?.appendChild(allButton);
 
-    // Créer les boutons pour les 3 premières catégories
-    dataCategories.slice(0, 3).forEach((category) => {
+    // Créer les boutons pour les catégories
+    dataCategories.forEach((category) => {
       const categoryButton = document.createElement("button");
       categoryButton.classList.add("buttonShape");
       const categoryName = category.name;
@@ -69,6 +74,7 @@ const getCategories = async () => {
   }
 };
 
+// Fonction pour ajouter des écouteurs d'événements aux boutons
 const addEventListenersToButtons = () => {
   const buttons = document.querySelectorAll("#categories button");
   buttons.forEach((button) => {
@@ -93,20 +99,41 @@ const addEventListenersToButtons = () => {
   });
 };
 
+// Fonction pour vérifier l'état de connexion
 const checkLoginStatus = () => {
   const auth = JSON.parse(localStorage.getItem("auth"));
+
   if (auth && auth.token) {
-    loginLink.textContent = "logout";
+    // Utilisateur connecté
+    loginLink.textContent = "Logout";
     loginLink.href = "#";
     loginLink.classList.add("logout-link"); // Ajoute la classe CSS
-    loginLink.addEventListener("click", (event) => {
-      event.preventDefault();
-      localStorage.removeItem("auth");
-      window.location.reload();
-    });
+    loginLink.removeEventListener("click", logoutHandler); // Retirer les anciens écouteurs d'événements
+    loginLink.addEventListener("click", logoutHandler);
+    // Masquer les catégories si l'utilisateur est connecté
+    if (categoriesContainer) {
+      categoriesContainer.classList.add("hidden");
+    }
+  } else {
+    // Utilisateur non connecté
+    loginLink.textContent = "Login";
+    loginLink.href = "login.html"; // Assure-toi que ce lien est correct
+    loginLink.classList.remove("logout-link");
+    // Afficher les catégories si l'utilisateur n'est pas connecté
+    if (categoriesContainer) {
+      categoriesContainer.classList.remove("hidden");
+    }
   }
 };
 
+// Fonction pour gérer la déconnexion
+const logoutHandler = (event) => {
+  event.preventDefault();
+  localStorage.removeItem("auth");
+  window.location.reload();
+};
+
+// Appeler les fonctions au chargement de la page
+checkLoginStatus();
 getCategories();
 getWorks();
-checkLoginStatus();
