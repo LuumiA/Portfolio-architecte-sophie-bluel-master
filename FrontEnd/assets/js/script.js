@@ -1,10 +1,11 @@
-// variables globals
-
+// Variables globals
 const galleryContainer = document.querySelector(".gallery");
 const categoriesContainer = document.getElementById("categories");
+const loginLink = document.getElementById("login-link");
 
 const API = "http://localhost:5678/api/works";
 let allWorks = [];
+
 const getWorks = async () => {
   try {
     const result = await fetch(`${API}`);
@@ -85,12 +86,27 @@ const addEventListenersToButtons = () => {
         );
         displayWorks(filteredWorks);
       } else {
-        console.log("tout les works sont", allWorks);
+        console.log("tous les works sont", allWorks);
         displayWorks(allWorks); // Afficher tous les works si "Tous" est cliqué
       }
     });
   });
 };
 
+const checkLoginStatus = () => {
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  if (auth && auth.token) {
+    loginLink.textContent = "logout";
+    loginLink.href = "#";
+    loginLink.classList.add("logout-link"); // Ajoute la classe CSS
+    loginLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      localStorage.removeItem("auth");
+      window.location.reload();
+    });
+  }
+};
+
 getCategories();
 getWorks();
+checkLoginStatus();
