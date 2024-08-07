@@ -2,6 +2,9 @@
 const galleryContainer = document.querySelector(".gallery");
 const categoriesContainer = document.getElementById("categories");
 const loginLink = document.getElementById("login-link");
+const modal = document.getElementById("modal");
+const closeModalButton = document.querySelector(".modal .close");
+const editLink = document.getElementById("edit-link");
 
 const API = "http://localhost:5678/api/works";
 let allWorks = [];
@@ -105,10 +108,11 @@ const checkLoginStatus = () => {
 
   if (auth && auth.token) {
     // Utilisateur connecté
+    console.log("Utilisateur connecté");
     loginLink.textContent = "Logout";
     loginLink.href = "#";
-    loginLink.classList.add("logout-link"); // Ajoute la classe CSS
-    loginLink.removeEventListener("click", logoutHandler); // Retirer les anciens écouteurs d'événements
+    loginLink.classList.add("logout-link");
+    loginLink.removeEventListener("click", logoutHandler);
     loginLink.addEventListener("click", logoutHandler);
     // Masquer les catégories si l'utilisateur est connecté
     if (categoriesContainer) {
@@ -116,8 +120,9 @@ const checkLoginStatus = () => {
     }
   } else {
     // Utilisateur non connecté
+    console.log("Utilisateur non connecté");
     loginLink.textContent = "Login";
-    loginLink.href = "login.html"; // Assure-toi que ce lien est correct
+    loginLink.href = "login.html";
     loginLink.classList.remove("logout-link");
     // Afficher les catégories si l'utilisateur n'est pas connecté
     if (categoriesContainer) {
@@ -132,6 +137,47 @@ const logoutHandler = (event) => {
   localStorage.removeItem("auth");
   window.location.reload();
 };
+
+// Fonction pour ouvrir la modal
+const openModal = () => {
+  if (modal) {
+    modal.classList.remove("hidden");
+  }
+};
+
+// Fonction pour fermer la modal
+const closeModal = () => {
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+};
+
+// Vérifiez si les éléments sont trouvés
+console.log("editLink:", editLink);
+console.log("closeModalButton:", closeModalButton);
+console.log("modal:", modal);
+
+// Événement pour ouvrir la modal lorsqu'on clique sur le lien modifier
+if (editLink) {
+  editLink.addEventListener("click", (event) => {
+    event.preventDefault(); // Empêche le lien de naviguer
+    openModal();
+  });
+}
+
+// Événement pour fermer la modal lorsqu'on clique sur le bouton de fermeture
+if (closeModalButton) {
+  closeModalButton.addEventListener("click", closeModal);
+}
+
+// Événement pour fermer la modal lorsqu'on clique en dehors de la modal
+if (modal) {
+  window.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+}
 
 // Appeler les fonctions au chargement de la page
 checkLoginStatus();
