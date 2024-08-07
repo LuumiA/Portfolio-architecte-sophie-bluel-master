@@ -15,22 +15,25 @@ const loginUser = async (email, password) => {
       },
       body: JSON.stringify({ email, password }),
     });
-    console.log("Le body est", JSON.stringify(email, password));
+    if (!response.ok) {
+      throw new Error("La reponse du reseau n'est pas ok");
+    }
     const data = await response.json();
-    if (response.ok) {
-      localStorage.setItem("auth", JSON.stringify(data));
-      const auth = JSON.parse(localStorage.getItem("auth"));
-      if (auth && auth.token) {
-        window.location = "index.html";
-      } else {
-        messageError.style.display = "flex";
-      }
+    localStorage.setItem("token", JSON.stringify(data.token));
+    if (JSON.parse(localStorage.getItem("token"))) {
+      window.location = "index.html";
     } else {
       messageError.style.display = "flex";
+      setTimeout(() => {
+        messageError.style.display = "none";
+      }, 3000);
     }
   } catch (error) {
     console.error("Il y'as eu une erreur au niveau de la conexion", error);
     messageError.style.display = "flex";
+    setTimeout(() => {
+      messageError.style.display = "none";
+    }, 3000);
   }
 };
 

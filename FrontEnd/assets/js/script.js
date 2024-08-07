@@ -5,6 +5,7 @@ const loginLink = document.getElementById("login-link");
 const modal = document.getElementById("modal");
 const closeModalButton = document.querySelector(".modal .close");
 const editLink = document.getElementById("edit-link");
+const editIcon = document.querySelector(".edit-section i");
 
 const API = "http://localhost:5678/api/works";
 let allWorks = [];
@@ -104,11 +105,10 @@ const addEventListenersToButtons = () => {
 
 // Fonction pour vérifier l'état de connexion
 const checkLoginStatus = () => {
-  const auth = JSON.parse(localStorage.getItem("auth"));
+  const token = localStorage.getItem("token");
 
-  if (auth && auth.token) {
+  if (token) {
     // Utilisateur connecté
-    console.log("Utilisateur connecté");
     loginLink.textContent = "Logout";
     loginLink.href = "#";
     loginLink.classList.add("logout-link");
@@ -118,9 +118,15 @@ const checkLoginStatus = () => {
     if (categoriesContainer) {
       categoriesContainer.classList.add("hidden");
     }
+    // Afficher le lien "modifier" et l'icône si l'utilisateur est connecté
+    if (editLink) {
+      editLink.classList.remove("hidden");
+    }
+    if (editIcon) {
+      editIcon.classList.remove("hidden");
+    }
   } else {
     // Utilisateur non connecté
-    console.log("Utilisateur non connecté");
     loginLink.textContent = "Login";
     loginLink.href = "login.html";
     loginLink.classList.remove("logout-link");
@@ -128,13 +134,20 @@ const checkLoginStatus = () => {
     if (categoriesContainer) {
       categoriesContainer.classList.remove("hidden");
     }
+    // Masquer le lien "modifier" et l'icône si l'utilisateur n'est pas connecté
+    if (editLink) {
+      editLink.classList.add("hidden");
+    }
+    if (editIcon) {
+      editIcon.classList.add("hidden");
+    }
   }
 };
 
 // Fonction pour gérer la déconnexion
 const logoutHandler = (event) => {
   event.preventDefault();
-  localStorage.removeItem("auth");
+  localStorage.removeItem("token");
   window.location.reload();
 };
 

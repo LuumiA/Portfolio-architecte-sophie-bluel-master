@@ -262,3 +262,11 @@ footer nav ul {
   font-weight: 500;
   margin-left: 108px;
 }
+
+#msg-error {
+  display: none;
+  color: red;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
