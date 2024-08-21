@@ -86,13 +86,71 @@
         </ul>
       </nav>
     </footer>
+
     <!-- Modal HTML -->
     <div id="modal" class="modal hidden">
       <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Galerie photo</h2>
+        <div id="projects-container" class="projects-container">
+          <!-- Les projets seront injectés ici dynamiquement -->
+        </div>
+        <div class="separator-line"></div>
+        <button class="add-photo-button">Ajouter une photo</button>
       </div>
     </div>
+
+    <!-- Modal d'ajout de photo -->
+    <div id="add-photo-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="close"><i class="fa-solid fa-xmark"></i></button>
+        <button class="back-arrow">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <h2>Ajout photo</h2>
+        <form action="#" method="post" enctype="multipart/form-data">
+          <div class="photo-card">
+            <div class="photo-icon">
+              <i class="fa-regular fa-image"></i>
+            </div>
+            <!-- Bouton pour ouvrir le sélecteur de fichiers -->
+            <label class="add-photo-button-in-card" for="file-input"
+              >+ Ajouter photo</label
+            >
+            <!-- Sélecteur de fichiers caché -->
+            <input
+              type="file"
+              id="file-input"
+              accept="image/*"
+              style="display: none"
+            />
+            <p class="info">jpg. png : 4mo max</p>
+            <div class="image-preview-container">
+              <img
+                id="imagePreview"
+                src=""
+                alt="Prévisualisation"
+                class="image-preview"
+              />
+            </div>
+          </div>
+          <div class="form-section">
+            <label for="title">Titre</label>
+            <input type="text" id="title" name="title" />
+            <label for="category">Catégorie</label>
+            <select id="category" name="category">
+              <!-- Les options seront ajoutées dynamiquement avec JavaScript -->
+            </select>
+          </div>
+
+          <div class="modal-footer">
+            <hr class="footer-line" />
+            <button class="validate-button">Valider</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="./assets/js/script.js"></script>
   </body>
 </html>

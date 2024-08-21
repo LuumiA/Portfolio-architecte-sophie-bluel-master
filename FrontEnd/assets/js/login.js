@@ -19,8 +19,11 @@ const loginUser = async (email, password) => {
       throw new Error("La reponse du reseau n'est pas ok");
     }
     const data = await response.json();
-    localStorage.setItem("token", JSON.stringify(data.token));
-    if (JSON.parse(localStorage.getItem("token"))) {
+
+    console.log("Le token est ", data.token);
+    console.log("Le tokken recuperer est ", localStorage.getItem("token"));
+    if (data.token) {
+      localStorage.setItem("token", data.token);
       window.location = "index.html";
     } else {
       messageError.style.display = "flex";
