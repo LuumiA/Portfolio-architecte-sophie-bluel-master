@@ -519,6 +519,9 @@ footer nav ul {
 }
 
 .add-photo-button-in-card {
+  display: flex !important; /* Utiliser Flexbox pour centrer le contenu */
+  justify-content: center; /* Centrer horizontalement */
+  align-items: center; /* Centrer verticalement */
   width: 173px;
   height: 36px;
   border-radius: 50px;
@@ -530,6 +533,7 @@ footer nav ul {
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
+  margin: 0 auto !important; /* Centrer horizontalement le bouton dans son conteneur */
 }
 
 .info {
@@ -562,7 +566,7 @@ footer nav ul {
 
 #add-photo-modal input,
 #add-photo-modal select {
-  width: 100%;
+  width: 95%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -592,7 +596,7 @@ footer nav ul {
 .validate-button {
   width: 237px;
   height: 36px;
-  background-color: #a7a7a7;
+  background-color: #1d6154;
   border: none;
   border-radius: 60px;
   color: #fff;
@@ -610,12 +614,20 @@ footer nav ul {
 }
 
 .image-preview-container {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Assure que le conteneur prend toute la hauteur */
 }
 .image-preview {
   max-width: 100%;
   max-height: 168px;
+  object-fit: contain; /* Pour s'assurer que l'image garde ses proportions */
   display: none;
-  margin: -188px auto 0;
+  margin: -133px auto 0;
   /* Hide image preview initially */
+}
+
+.fa-regular {
+  color: #b9c5cc !important;
 }

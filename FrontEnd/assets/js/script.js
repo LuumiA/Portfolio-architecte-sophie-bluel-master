@@ -334,7 +334,89 @@ const categoriesSelect = () => {
   });
 };
 
-// Appeler les fonctions au chargement de la page
-checkLoginStatus();
-getCategories();
-getWorks();
+// Fonction pour envoyer les données de l'image au serveur
+const submitPhoto = async (event) => {
+  event.preventDefault(); // Empêche le comportement par défaut du bouton (soumission du formulaire)
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Vous devez être connecté pour ajouter une photo.");
+    return;
+  }
+
+  const titleInput = document.getElementById("title");
+  const categorySelect = document.getElementById("category");
+  const fileInput = document.getElementById("file-input");
+  const imagePreview = document.getElementById("imagePreview");
+
+  // Vérifier si les éléments existent
+  if (!titleInput || !categorySelect || !fileInput || !imagePreview) {
+    console.error("Un ou plusieurs éléments requis sont manquants.");
+    return;
+  }
+
+  const title = titleInput.value;
+  const categoryId = categorySelect.selectedOptions[0]?.id;
+  const file = fileInput.files[0];
+
+  if (!title || !categoryId || !file) {
+    alert("Veuillez remplir tous les champs et sélectionner une image.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("category", categoryId);
+  formData.append("image", file);
+
+  try {
+    const response = await fetch(API, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur lors de l'ajout de la photo: ${response.status}`);
+    }
+
+    // Réinitialiser la prévisualisation et les champs du formulaire
+    imagePreview.src = "";
+    imagePreview.style.display = "none";
+    fileInput.value = "";
+    titleInput.value = "";
+    categorySelect.selectedIndex = 0;
+
+    // Fermer la modal d'ajout de photo
+    closeAddPhotoModal();
+
+    // Rafraîchir les œuvres affichées
+    await getWorks();
+    displayProjectsInModal();
+
+    // Redirection vers index.html après un délai pour s'assurer que la requête est traitée
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1000);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de la photo:", error);
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkLoginStatus();
+  getCategories();
+  getWorks();
+
+  // Sélectionner le bouton "Valider" dans la modal d'ajout de photo
+  const validatePhotoButton = document.querySelector(
+    "#add-photo-modal .validate-button"
+  );
+  if (validatePhotoButton) {
+    validatePhotoButton.addEventListener("click", submitPhoto);
+  } else {
+    console.error("Le bouton 'Valider' est introuvable.");
+  }
+});
