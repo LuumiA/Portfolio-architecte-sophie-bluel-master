@@ -6,9 +6,12 @@ const modal = document.getElementById("modal");
 const closeModalButton = document.querySelector(".modal .close");
 const editLink = document.getElementById("edit-link");
 const editIcon = document.querySelector(".edit-section i");
+const allEdit = document.querySelector(".edit-section");
 const selectedCategory = document.querySelector("#category");
 const fileInput = document.getElementById("file-input");
 const imagePreview = document.querySelector("#imagePreview");
+const modalAjoutPhoto = document.querySelector("#add-photo-modal");
+const projectsContainer = document.getElementById("projects-container");
 
 const API = "http://localhost:5678/api/works";
 const APIDelete = "http://localhost:5678/api/works/2";
@@ -122,11 +125,8 @@ const checkLoginStatus = () => {
       categoriesContainer.classList.add("hidden");
     }
     // Afficher le lien "modifier" et l'icône si l'utilisateur est connecté
-    if (editLink) {
-      editLink.classList.remove("hidden");
-    }
-    if (editIcon) {
-      editIcon.classList.remove("hidden");
+    if (allEdit) {
+      allEdit.classList.remove("hidden");
     }
   } else {
     // Utilisateur non connecté
@@ -138,11 +138,8 @@ const checkLoginStatus = () => {
       categoriesContainer.classList.remove("hidden");
     }
     // Masquer le lien "modifier" et l'icône si l'utilisateur n'est pas connecté
-    if (editLink) {
-      editLink.classList.add("hidden");
-    }
-    if (editIcon) {
-      editIcon.classList.add("hidden");
+    if (allEdit) {
+      allEdit.classList.add("hidden");
     }
   }
 };
@@ -156,8 +153,9 @@ const logoutHandler = (event) => {
 
 // Fonction pour afficher les projets dans la modal avec une icône de suppression
 const displayProjectsInModal = () => {
-  const projectsContainer = document.getElementById("projects-container");
   projectsContainer.innerHTML = ""; // Vider le contenu actuel
+
+  console.log("allWork est ", allWorks);
 
   allWorks.forEach((work) => {
     const projectCard = document.createElement("div");
@@ -192,6 +190,7 @@ const deleteProject = async (projectId) => {
     return;
   }
   const confirmation = confirm("Etes vous sur de vouloir supprimer ce work ? ");
+  if (!confirmation) return;
   console.log("le token est" + token);
   try {
     const response = await fetch(`${API}/${projectId}`, {
@@ -210,12 +209,14 @@ const deleteProject = async (projectId) => {
   galleryContainer.innerHTML = "";
   getWorks();
   displayProjectsInModal();
+  //Fermer la modal principal
+  modal.style.display = "none";
 };
 
 // Fonction pour ouvrir la modal
 const openModal = () => {
   if (modal) {
-    modal.classList.remove("hidden");
+    modal.style.display = "flex";
     displayProjectsInModal(); // Afficher les projets dans la modal
   }
 };
@@ -233,12 +234,10 @@ console.log("closeModalButton:", closeModalButton);
 console.log("modal:", modal);
 
 // Événement pour ouvrir la modal lorsqu'on clique sur le lien modifier
-if (editLink) {
-  editLink.addEventListener("click", (event) => {
-    event.preventDefault(); // Empêche le lien de naviguer
-    openModal();
-  });
-}
+allEdit?.addEventListener("click", (event) => {
+  event.preventDefault(); // Empêche le lien de naviguer
+  openModal();
+});
 
 // Événement pour fermer la modal lorsqu'on clique sur le bouton de fermeture
 if (closeModalButton) {
@@ -256,8 +255,8 @@ if (modal) {
 
 // Fonction pour ouvrir la modal d'ajout de photo
 const openAddPhotoModal = () => {
-  addPhotoModal.classList.remove("hidden");
-  modal.classList.add("hidden"); // Masquer la modal principale
+  addPhotoModal.style.display = "flex";
+  modal.style.display = "none"; // Masquer la modal principale
   categoriesSelect();
 };
 
@@ -269,7 +268,7 @@ const closeAddPhotoModal = () => {
 // Fonction pour revenir à la modal principale
 const backToPreviousModal = () => {
   closeAddPhotoModal();
-  modal.classList.remove("hidden");
+  modal.style.display = "none";
 };
 
 // Éléments pour la modal d'ajout de photo
@@ -364,6 +363,9 @@ const submitPhoto = async (event) => {
     return;
   }
 
+  const confirmation = confirm("Etes vous sur de vouloir ajouter ce work ? ");
+  if (!confirmation) return;
+
   const formData = new FormData();
   formData.append("title", title);
   formData.append("category", categoryId);
@@ -382,17 +384,12 @@ const submitPhoto = async (event) => {
       throw new Error(`Erreur lors de l'ajout de la photo: ${response.status}`);
     }
 
-    // Réinitialiser la prévisualisation et les champs du formulaire
-    imagePreview.src = "";
-    imagePreview.style.display = "none";
-    fileInput.value = "";
-    titleInput.value = "";
-    categorySelect.selectedIndex = 0;
-
     // Fermer la modal d'ajout de photo
     closeAddPhotoModal();
 
     // Rafraîchir les œuvres affichées
+    //Vide la galerry pour eviter les doublons
+    galleryContainer.innerHTML = "";
     await getWorks();
     displayProjectsInModal();
 
@@ -405,10 +402,20 @@ const submitPhoto = async (event) => {
   }
 };
 
+const resteInput = () => {
+  // Réinitialiser la prévisualisation et les champs du formulaire
+  imagePreview.src = "";
+  imagePreview.style.display = "none";
+  fileInput.value = "";
+  titleInput.value = "";
+  categorySelect.selectedIndex = 0;
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   checkLoginStatus();
   getCategories();
   getWorks();
+  displayProjectsInModal();
 
   // Sélectionner le bouton "Valider" dans la modal d'ajout de photo
   const validatePhotoButton = document.querySelector(
