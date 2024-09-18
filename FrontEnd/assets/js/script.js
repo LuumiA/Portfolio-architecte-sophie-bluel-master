@@ -2,16 +2,33 @@
 const galleryContainer = document.querySelector(".gallery");
 const categoriesContainer = document.getElementById("categories");
 const loginLink = document.getElementById("login-link");
-const modal = document.getElementById("modal");
-const closeModalButton = document.querySelector(".modal .close");
+const mainModal = document.getElementById("modal");
+
+//Selectionne tous les boutons close
+const closeModalButtons = document.querySelectorAll(".modal .close");
+
 const editLink = document.getElementById("edit-link");
 const editIcon = document.querySelector(".edit-section i");
 const allEdit = document.querySelector(".edit-section");
 const selectedCategory = document.querySelector("#category");
 const fileInput = document.getElementById("file-input");
 const imagePreview = document.querySelector("#imagePreview");
-const modalAjoutPhoto = document.querySelector("#add-photo-modal");
+
 const projectsContainer = document.getElementById("projects-container");
+const addPhotoModal = document.querySelector("#add-photo-modal");
+const backArrow = document.querySelector(".back-arrow");
+const openAddPhotoButton = document.querySelector(".add-photo-button");
+const titleInput = document.getElementById("title");
+const categorySelect = document.getElementById("category");
+
+const addFile = document.querySelector(".add-photo-button-in-card");
+const iconPreview = document.querySelector(".photo-icon");
+const formP = document.querySelector("form p");
+
+const validatePhotoButton = document.querySelector(
+  "#add-photo-modal .validate-button"
+);
+const admin = document.querySelector(".admin");
 
 const API = "http://localhost:5678/api/works";
 const APIDelete = "http://localhost:5678/api/works/2";
@@ -115,31 +132,34 @@ const checkLoginStatus = () => {
 
   if (token) {
     // Utilisateur connecté
-    loginLink.textContent = "Logout";
+    loginLink.textContent = "logout";
     loginLink.href = "#";
     loginLink.classList.add("logout-link");
     loginLink.removeEventListener("click", logoutHandler);
     loginLink.addEventListener("click", logoutHandler);
+
+    // Afficher la bannière édition si l'utilisateur est connecté
+    admin.innerHTML =
+      '<button class="editMode"> <i class="fas fa-pen-to-square"></i> Mode édition</button>';
+    admin.classList.add("blackLineEdition");
     // Masquer les catégories si l'utilisateur est connecté
     if (categoriesContainer) {
-      categoriesContainer.classList.add("hidden");
+      categoriesContainer.style.display = "none";
     }
     // Afficher le lien "modifier" et l'icône si l'utilisateur est connecté
     if (allEdit) {
-      allEdit.classList.remove("hidden");
+      allEdit.style.display = "flex";
     }
   } else {
     // Utilisateur non connecté
-    loginLink.textContent = "Login";
+    loginLink.textContent = "login";
     loginLink.href = "login.html";
     loginLink.classList.remove("logout-link");
-    // Afficher les catégories si l'utilisateur n'est pas connecté
-    if (categoriesContainer) {
-      categoriesContainer.classList.remove("hidden");
-    }
+    admin.style.display = "none";
+
     // Masquer le lien "modifier" et l'icône si l'utilisateur n'est pas connecté
     if (allEdit) {
-      allEdit.classList.add("hidden");
+      allEdit.style.display = "none";
     }
   }
 };
@@ -210,28 +230,26 @@ const deleteProject = async (projectId) => {
   getWorks();
   displayProjectsInModal();
   //Fermer la modal principal
-  modal.style.display = "none";
+  mainModal.style.display = "none";
 };
 
-// Fonction pour ouvrir la modal
+// Fonction pour ouvrir la modale principale
 const openModal = () => {
-  if (modal) {
-    modal.style.display = "flex";
+  if (mainModal) {
+    mainModal.style.display = "flex";
     displayProjectsInModal(); // Afficher les projets dans la modal
   }
 };
 
-// Fonction pour fermer la modal
-const closeModal = () => {
-  if (modal) {
-    modal.classList.add("hidden");
-  }
+//  Fonction pour fermer la modale spécifique
+const closeModal = (modal) => {
+  modal.style.display = "none";
 };
 
 // Vérifiez si les éléments sont trouvés
 console.log("editLink:", editLink);
-console.log("closeModalButton:", closeModalButton);
-console.log("modal:", modal);
+console.log("closeModalButtons:", closeModalButtons);
+console.log("modal:", mainModal);
 
 // Événement pour ouvrir la modal lorsqu'on clique sur le lien modifier
 allEdit?.addEventListener("click", (event) => {
@@ -239,54 +257,50 @@ allEdit?.addEventListener("click", (event) => {
   openModal();
 });
 
-// Événement pour fermer la modal lorsqu'on clique sur le bouton de fermeture
-if (closeModalButton) {
-  closeModalButton.addEventListener("click", closeModal);
-}
-
-// Événement pour fermer la modal lorsqu'on clique en dehors de la modal
-if (modal) {
-  window.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeModal();
+// Execute l'événement de fermeture à tous les boutons "close"
+closeModalButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const modal = button.closest(".modal"); // Sélectionner la modale parente du bouton
+    if (modal === mainModal) {
+      closeModal(mainModal);
+    } else if (modal === addPhotoModal) {
+      closeModal(addPhotoModal);
     }
   });
-}
+});
+
+// Fermer les modales en cliquant en dehors de la zone de contenu
+window.addEventListener("click", (event) => {
+  if (event.target === mainModal) {
+    closeModal(mainModal);
+  } else if (event.target === addPhotoModal) {
+    closeModal(addPhotoModal);
+  }
+});
 
 // Fonction pour ouvrir la modal d'ajout de photo
 const openAddPhotoModal = () => {
   addPhotoModal.style.display = "flex";
-  modal.style.display = "none"; // Masquer la modal principale
+  mainModal.style.display = "none"; // Masquer la modal principale
   categoriesSelect();
+  checkFormValidity();
+  resetInput();
 };
 
 // Fonction pour fermer la modal d'ajout de photo
 const closeAddPhotoModal = () => {
-  addPhotoModal.classList.add("hidden");
+  addPhotoModal.style.display = "none";
 };
 
 // Fonction pour revenir à la modal principale
 const backToPreviousModal = () => {
   closeAddPhotoModal();
-  modal.style.display = "none";
+  mainModal.style.display = "flex"; // Afficher la modal principale
 };
 
-// Éléments pour la modal d'ajout de photo
-const addPhotoModal = document.getElementById("add-photo-modal");
-const backArrow = addPhotoModal.querySelector(".back-arrow");
-const openAddPhotoButton = document.querySelector(".add-photo-button");
-
 // Événements pour ouvrir et fermer la modal d'ajout de photo
-openAddPhotoButton.addEventListener("click", openAddPhotoModal);
+openAddPhotoButton?.addEventListener("click", openAddPhotoModal);
 backArrow.addEventListener("click", backToPreviousModal);
-addPhotoModal
-  .querySelector(".close")
-  .addEventListener("click", closeAddPhotoModal);
-
-// Sélectionner les éléments pour la modal d'ajout de photo
-const addPhotoButtonInCard = document.querySelector(
-  ".add-photo-button-in-card"
-);
 
 //Method pour l'ajout de la prévisualisation
 fileInput.addEventListener("change", (event) => {
@@ -306,8 +320,9 @@ fileInput.addEventListener("change", (event) => {
     reader.onload = function (e) {
       imagePreview.src = e.target.result;
       imagePreview.style.display = "block"; // Afficher la prévisualisation de l'image
-      document.querySelector(".add-photo-button-in-card").style.display =
-        "none";
+      addFile.style.display = "none";
+      iconPreview.style.display = "none";
+      formP.style.display = "none";
     };
     reader.readAsDataURL(file);
   } else {
@@ -343,11 +358,6 @@ const submitPhoto = async (event) => {
     return;
   }
 
-  const titleInput = document.getElementById("title");
-  const categorySelect = document.getElementById("category");
-  const fileInput = document.getElementById("file-input");
-  const imagePreview = document.getElementById("imagePreview");
-
   // Vérifier si les éléments existent
   if (!titleInput || !categorySelect || !fileInput || !imagePreview) {
     console.error("Un ou plusieurs éléments requis sont manquants.");
@@ -363,7 +373,7 @@ const submitPhoto = async (event) => {
     return;
   }
 
-  const confirmation = confirm("Etes vous sur de vouloir ajouter ce work ? ");
+  const confirmation = confirm(`Etes vous sur de vouloir ajouter ${title} ?`);
   if (!confirmation) return;
 
   const formData = new FormData();
@@ -384,32 +394,48 @@ const submitPhoto = async (event) => {
       throw new Error(`Erreur lors de l'ajout de la photo: ${response.status}`);
     }
 
-    // Fermer la modal d'ajout de photo
-    closeAddPhotoModal();
-
     // Rafraîchir les œuvres affichées
     //Vide la galerry pour eviter les doublons
     galleryContainer.innerHTML = "";
     await getWorks();
     displayProjectsInModal();
-
-    // Redirection vers index.html après un délai pour s'assurer que la requête est traitée
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 1000);
+    addPhotoModal.style.display = "none";
   } catch (error) {
     console.error("Erreur lors de l'ajout de la photo:", error);
   }
 };
 
-const resteInput = () => {
+const resetInput = () => {
   // Réinitialiser la prévisualisation et les champs du formulaire
   imagePreview.src = "";
   imagePreview.style.display = "none";
   fileInput.value = "";
   titleInput.value = "";
-  categorySelect.selectedIndex = 0;
+  categorySelect.value = "";
+  addFile.style.display = "flex";
+  iconPreview.style.display = "block";
+  formP.style.display = "block";
+  validatePhotoButton.disabled = true;
 };
+
+// Fonction pour vérifier la validité du formulaire(désactiver et griser le bouton de validation si le formulaire n'est pas valide)
+const checkFormValidity = () => {
+  const isFileSelected = fileInput.files.length > 0; // Vérifier si un fichier est sélectionné
+  const isTitleFilled = titleInput.value.trim() !== ""; // Vérifier si le titre est rempli
+  const isCategorySelected = categorySelect.value !== ""; // Vérifier si une catégorie est sélectionnée
+
+  // Activer le bouton de validation si toutes les conditions sont remplies
+  if (isFileSelected && isTitleFilled && isCategorySelected) {
+    validatePhotoButton.disabled = false;
+  } else {
+    validatePhotoButton.disabled = true;
+  }
+};
+
+// Ajouter des écouteurs d'événements pour vérifier la validité du formulaire lorsque les champs sont modifiés
+fileInput.addEventListener("change", checkFormValidity);
+titleInput.addEventListener("input", checkFormValidity); //input car on veut que l'utilisateur tape quelque chose
+categorySelect.addEventListener("change", checkFormValidity); //On utilise un changement car on veut que l'utilisateur choisisse une catégorie
 
 document.addEventListener("DOMContentLoaded", () => {
   checkLoginStatus();
@@ -418,9 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
   displayProjectsInModal();
 
   // Sélectionner le bouton "Valider" dans la modal d'ajout de photo
-  const validatePhotoButton = document.querySelector(
-    "#add-photo-modal .validate-button"
-  );
+
   if (validatePhotoButton) {
     validatePhotoButton.addEventListener("click", submitPhoto);
   } else {
